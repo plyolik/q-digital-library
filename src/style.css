@@ -1,0 +1,50 @@
+body {
+    background-color: bisque;
+}
+
+h3 {
+    color: indianred;
+}
+
+.active {
+    font-weight: 600;
+    color: darkslategray;
+}
+
+
+ul li {
+    color:cadetblue;
+    cursor: pointer;
+}
+
+.write-yourself-block {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+}
+
+.text-input {
+    margin: 0px;
+    height: 200px;
+    width: 294px;
+    resize: none;
+}
+
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    padding: 7px 64px;
+    cursor: pointer;
+}
+
+.btn {
+    background-color: cadetblue;
+    color: wheat;
+    width: 200px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: sans-serif;
+}
