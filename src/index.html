@@ -6,23 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library</title>
     <link rel="stylesheet" href="style.css" >
+    <link rel="stylesheet" href="css/all.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-<body>
+<body class="body">
+    <header>
 
-<ul class="my-library">
-    <h3>Моя библиотека</h3>
-    <li id="write-yourself">
-        <span>Написать самому</span>
-    </li></br>
-    <li id="load-from-file">
-        <span>Загрузить из файла</span>
-    </li>
-</ul>
+    </header>
 
-<section class='upload-form'>
-</section>
-
+    <main>
+        <div class="wrapper">
+            <section class="side fond">
+                <h3>Моя библиотека</h3>
+                <section class="favorite-books"></section>
+                <section class="wraper-list-books">
+                    <h4>Список книг</h4>
+                    <div class="list-books">
+                    </div>
+                </section>
+                <section class="add-book">
+                    <h4>Добавить книгу</h4>
+                    <ul class="my-library"></ul>
+                    <li id="write-yourself">
+                        <span>Написать самому</span>
+                    </li></br>
+                    <li id="load-from-file">
+                        <span>Загрузить из файла</span>
+                    </li>
+                    </ul>
+                    <section class='upload-form'>
+                    </section>
+                </section>    
+            </section>
+            <section class="divider"></section>
+            <section class="book-reader fond">
+            </section>
+        </div>
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close">&times;</span>
+                <h3>Редактировать книгу</h3>
+              </div>
+              <div class="modal-body">
+                <p class="title">Введите название книги</p>
+                <input class="edit-title-input"> 
+                <textarea class="edit-text-input" placeholder="Текст..."></textarea>
+                <button id="edit-btn-upload" class="btn">Сохранить изменения</button>
+              </div>
+            </div>
+          </div>
+    </main>
+    <footer>
+    </footer>
 <script src="script.js"></script>
 </body>
 </html>

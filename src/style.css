@@ -1,19 +1,25 @@
-body {
-    background-color: bisque;
+.body {
+    width: 1440px;
+    background-size: 125%;
+    background-image:  url("https://c.pxhere.com/photos/d2/e7/books_pages_story_stories_notes_reminder_remember_read-566197.jpg!d");
+    background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("https://c.pxhere.com/photos/d2/e7/books_pages_story_stories_notes_reminder_remember_read-566197.jpg!d");
+
 }
 
 h3 {
-    color: indianred;
+    color: rgb(32, 11, 11);
 }
 
 .active {
     font-weight: 600;
     color: darkslategray;
+
 }
 
 
 ul li {
-    color:cadetblue;
+    color: darkslategray;
+
     cursor: pointer;
 }
 
@@ -33,13 +39,14 @@ ul li {
 input[type="file"] {
     display: none;
 }
+
 .custom-file-upload {
     padding: 7px 64px;
     cursor: pointer;
 }
 
 .btn {
-    background-color: cadetblue;
+    background-color: rgb(121 85 72);
     color: wheat;
     width: 200px;
     height: 30px;
@@ -48,3 +55,126 @@ input[type="file"] {
     font-size: 15px;
     font-family: sans-serif;
 }
+
+.wrapper {
+    display: flex;
+}
+.book-reader {
+    width: 60%;
+}
+
+.side {
+    width: 40%;
+}
+
+.divider {
+    width: 4px;
+    background-color: goldenrod;
+}
+
+.fond {
+    padding: 10px;
+    min-height: calc(100vh - 72px);
+    margin: 10px;
+    background: linear-gradient( rgb(245 245 245 / 100%), rgb(245 245 245 / 40%) );
+}
+
+.book {
+    display: flex;
+    justify-content: space-between;
+}
+
+.finished-book {
+    background: cornsilk;
+}
+
+.icons {
+    width: 120px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4);
+}
+
+
+.modal-content {
+    position: relative;
+    background-color: rgb(255 214 190);
+    margin: auto;
+    padding: 0;
+    border: 2px solid rgb(224 131 76);
+    width: 27%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background: linear-gradient( rgb(224 131 76 / 75%), rgb(224 131 76 / 0% ) );
+    color: white;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    padding: 2px 16px;
+}
+
+.edit-text-input {
+    margin: 0px;
+    height: 200px;
+    width: 350px;
+    resize: none;
+    margin: 5px 0;
+}
+
+.edit-title-input {
+    width: 350px;
+    margin: 5px 0;
+}
+
+/* .edit-btn-upload {
+} */
+
+/* .load-from-file-block {
+
+} */
