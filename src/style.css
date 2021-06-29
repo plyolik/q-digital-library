@@ -190,6 +190,6 @@ input[type="file"] {
     padding: 10px;
 }
 
-.favorite-books {
-    min-height: 50px;
+.favorite-books > .list-books {
+    min-height: 40px;
 }
