@@ -161,6 +161,20 @@ function editBookHandler(book) {
             return
         }
 
+        const bookAll = books.find(b => b.text === book.text && b.title === book.title) 
+        const bookFav = booksFavorite.find(b => b.text === book.text && b.title === book.title)
+        if (bookAll) {
+            bookAll.title = editTitleInputValue
+            bookAll.text = editTextInputValue
+            bookAll.date = new Date()
+        } 
+        if (bookFav) {
+            bookFav.title = editTitleInputValue
+            bookFav.text = editTextInputValue
+            bookFav.date = new Date()
+            createListBooksFavorite()
+        }
+
         book.title = editTitleInputValue
         book.text = editTextInputValue
         book.date = new Date()
@@ -205,12 +219,10 @@ function initDragAndDrop() {
             return
         }
         bookFavorite = JSON.parse(bookFavorite)
-        const div = craeteBookElement(bookFavorite, false)
-
-        addBookElementListeners(bookFavorite, div, false)
-        booksFavoriteBlock.appendChild(div)
         booksFavorite.push(bookFavorite)
+        sortBookList(booksFavorite)
         saveBooks()
+        createListBooksFavorite()
     }
 }
 
@@ -224,7 +236,7 @@ function addBookElementListeners(book, div, removeFromAll) {
 
     editBookEl.onclick = () => editBookHandler(book)
     closeModalEl.onclick = () => closeModal()
-    deleteBookEl.onclick = (e) => {
+    deleteBookEl.onclick = () => {
         deleteBookHandler(book, booksFavorite)
         createListBooksFavorite()
         if (removeFromAll) {
@@ -234,7 +246,7 @@ function addBookElementListeners(book, div, removeFromAll) {
     }
     openBookEl.onclick = () => openBook(book)
     titleBookName.onclick = () => openBook(book)
-    checkBookEl.onclick = () => checkBook(div, book)
+    checkBookEl.onclick = () => checkBook(book)
 }
 
 function createListBooks() {
@@ -276,16 +288,25 @@ function openBook(book) {
     `
 }
 
-function checkBook(div, book) {
-    book.finished = !book.finished
-    div.classList.toggle('finished-book')
-    sortBookList()
+function checkBook(book) {
+    const bookAll = books.find(b => b.text === book.text && b.title === book.title) 
+    if (bookAll) {
+        bookAll.finished = !bookAll.finished
+    } 
+
+    const bookFav = booksFavorite.find(b => b.text === book.text && b.title === book.title) 
+    if (bookFav) {
+        bookFav.finished = !bookFav.finished
+        sortBookList(booksFavorite)
+        createListBooksFavorite()
+    }
+    sortBookList(books)
     createListBooks()
     saveBooks()
 }
 
-function sortBookList() {
-    books.sort((a,b) => new Date(b.date) - new Date(a.date)).sort((a, b) => b.finished - a.finished)
+function sortBookList(array) {
+    array.sort((a,b) => new Date(b.date) - new Date(a.date)).sort((a, b) => b.finished - a.finished)
 }
 
 writeYourselfBtn.addEventListener('click', writeYourselfType)
