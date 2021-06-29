@@ -4,9 +4,12 @@ const loadFromFileBtn = document.querySelector('#load-from-file')
 const uploadForm = document.querySelector('.upload-form')
 const listBooks = document.querySelector('.list-books')
 let bookReader = document.querySelector('.book-reader')
+const sideBlock = document.querySelector('.side')
+const booksFavoriteBlock = document.querySelector('.favorite-books')
 
 
 let books = []
+let booksFavorite = []
 let openedBook = null
 
 const writeYourselfBlock = `    
@@ -106,11 +109,17 @@ function uploadFile(file, filename) {
 function saveBooks() {
     let booksJson = JSON.stringify(books)
     localStorage.setItem('books', booksJson)
+
+    let booksFavoriteJson = JSON.stringify(booksFavorite)
+    localStorage.setItem('books favorite', booksFavoriteJson)
 }
 
 function getBooks() {
     const booksJson = localStorage.getItem('books')
     books = booksJson ? JSON.parse(booksJson) : []
+
+    const booksFavoriteJson = localStorage.getItem('books favorite')
+    booksFavorite = booksFavoriteJson ? JSON.parse(booksFavoriteJson) : []
 }
 
 function createListBooks() {
@@ -121,6 +130,7 @@ function createListBooks() {
         if (book.finished) {
             div.classList.add('finished-book')
         }
+        div.draggable = true
         div.innerHTML = `
         <span class="title-book">${book.title}</span>
         <div class="icons">
@@ -192,12 +202,56 @@ function createListBooks() {
             saveBooks()
         })
 
+
+        div.ondragstart = (event) => {
+            event.dataTransfer.setData('book', JSON.stringify(book))
+        }
+
+        booksFavoriteBlock.ondragenter = (event) => {
+            event.preventDefault()
+        }
+
+        booksFavoriteBlock.ondragover = (event) => {
+            event.preventDefault()
+        }
+
+        booksFavoriteBlock.ondrop = (event) => {
+            let bookFavorite = event.dataTransfer.getData('book')
+            if (!bookFavorite) {
+                return
+            }
+            bookFavorite = JSON.parse(bookFavorite)
+
+            const favDiv = document.createElement('div')
+            favDiv.className = 'book'
+            if (bookFavorite.finished) {
+                div.classList.add('finished-book')
+            }
+            favDiv.innerHTML = `
+            <span class="title-book">${bookFavorite.title}</span>
+            <div class="icons">
+                <i class="fas fa-book-open"></i>
+                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-edit myBtn"></i>
+                <i class="fas fa-check-square"></i>
+            </div>
+            `
+            booksFavoriteBlock.appendChild(favDiv)
+            booksFavorite.push(bookFavorite)
+            saveBooks()
+        }
+
+        
+
+        
+
         openBookEl.addEventListener('click', () => openBook(book))
         titleBookName.addEventListener('click', () => openBook(book))
         checkBookEl.addEventListener('click', ()=> checkBook(div, book))
 
     })
 }
+
 
 function openBook(book) {
     openedBook = book
