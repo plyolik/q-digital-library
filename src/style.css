@@ -1,13 +1,18 @@
 .body {
-    width: 1440px;
-    background-size: 125%;
+    cursor: default;
     background-image:  url("https://c.pxhere.com/photos/d2/e7/books_pages_story_stories_notes_reminder_remember_read-566197.jpg!d");
     background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("https://c.pxhere.com/photos/d2/e7/books_pages_story_stories_notes_reminder_remember_read-566197.jpg!d");
-
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 h3 {
     color: rgb(32, 11, 11);
+}
+
+h4 {
+    margin: 5px 0;
 }
 
 .active {
@@ -19,7 +24,10 @@ h3 {
 
 ul li {
     color: darkslategray;
+    cursor: pointer;
+}
 
+.h4 {
     cursor: pointer;
 }
 
@@ -54,13 +62,14 @@ input[type="file"] {
     border-radius: 4px;
     font-size: 15px;
     font-family: sans-serif;
+    cursor: pointer;
 }
 
 .wrapper {
     display: flex;
 }
 .book-reader {
-    width: 60%;
+    width: 55%;
 }
 
 .side {
@@ -74,7 +83,7 @@ input[type="file"] {
 
 .fond {
     padding: 10px;
-    min-height: calc(100vh - 72px);
+    min-height: calc(100vh - 56px);
     margin: 10px;
     background: linear-gradient( rgb(245 245 245 / 100%), rgb(245 245 245 / 40%) );
 }
@@ -82,6 +91,7 @@ input[type="file"] {
 .book {
     display: flex;
     justify-content: space-between;
+    width: 542px;
 }
 
 .finished-book {
@@ -172,9 +182,16 @@ input[type="file"] {
     margin: 5px 0;
 }
 
-/* .edit-btn-upload {
-} */
+.fas {
+    cursor: pointer;
+}
 
-/* .load-from-file-block {
+.border {
+    border: 1px solid wheat;
+    margin: 10px 0;
+    padding: 10px;
+}
 
-} */
+.favorite-books > .list-books {
+    min-height: 40px;
+}

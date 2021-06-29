@@ -2,11 +2,14 @@ const myLibrary = document.querySelector('.my-library')
 const writeYourselfBtn = document.querySelector('#write-yourself')
 const loadFromFileBtn = document.querySelector('#load-from-file')
 const uploadForm = document.querySelector('.upload-form')
-const listBooks = document.querySelector('.list-books')
-let bookReader = document.querySelector('.book-reader')
-
+const listBooks = document.querySelector('.wraper-list-books > .list-books')
+const bookReader = document.querySelector('.book-reader')
+const sideBlock = document.querySelector('.side')
+const booksFavoriteBlock = document.querySelector('.favorite-books > .list-books')
+const modalWindow = document.getElementById('myModal')
 
 let books = []
+let booksFavorite = []
 let openedBook = null
 
 const writeYourselfBlock = `    
@@ -106,96 +109,174 @@ function uploadFile(file, filename) {
 function saveBooks() {
     let booksJson = JSON.stringify(books)
     localStorage.setItem('books', booksJson)
+
+    let booksFavoriteJson = JSON.stringify(booksFavorite)
+    localStorage.setItem('books favorite', booksFavoriteJson)
 }
 
 function getBooks() {
     const booksJson = localStorage.getItem('books')
     books = booksJson ? JSON.parse(booksJson) : []
+
+    const booksFavoriteJson = localStorage.getItem('books favorite')
+    booksFavorite = booksFavoriteJson ? JSON.parse(booksFavoriteJson) : []
+}
+
+function craeteBookElement(book, draggable) {
+    const div = document.createElement('div')
+    div.className = 'book'
+    if (book.finished) {
+        div.classList.add('finished-book')
+    }
+    div.draggable = draggable
+    div.innerHTML = `
+    <span class="title-book">${book.title}</span>
+    <div class="icons">
+        <i class="fas fa-book-open"></i>
+        <i class="fas fa-trash-alt"></i>
+        <i class="fas fa-edit myBtn"></i>
+        <i class="fas fa-check-square"></i>
+    </div>
+    `
+    return div
+}
+
+
+function editBookHandler(book) {
+    modalWindow.style.display = "block";
+
+    const editTitleInput = document.querySelector('.edit-title-input')
+    const editTextInput = document.querySelector('.edit-text-input')
+    const editBtnUpload = document.getElementById('edit-btn-upload')
+
+    editTitleInput.value = book.title
+    editTextInput.value = book.text
+
+    editBtnUpload.onclick = () => {
+        const editTitleInputValue = editTitleInput.value
+        const editTextInputValue = editTextInput.value
+
+        if (!editTitleInputValue  || !editTextInputValue) {
+            alert('Поля не должны быть пустыми!')
+            return
+        }
+
+        const bookAll = books.find(b => b.text === book.text && b.title === book.title) 
+        const bookFav = booksFavorite.find(b => b.text === book.text && b.title === book.title)
+        if (bookAll) {
+            bookAll.title = editTitleInputValue
+            bookAll.text = editTextInputValue
+            bookAll.date = new Date()
+        } 
+        if (bookFav) {
+            bookFav.title = editTitleInputValue
+            bookFav.text = editTextInputValue
+            bookFav.date = new Date()
+            createListBooksFavorite()
+        }
+
+        book.title = editTitleInputValue
+        book.text = editTextInputValue
+        book.date = new Date()
+        saveBooks()
+        modalWindow.style.display = "none";
+        alert('Книга изменена')
+        createListBooks()
+    }
+}
+
+function closeModal() {
+    modalWindow.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modalWindow) {
+        closeModal()
+    }
+}
+
+function deleteBookHandler(book, array) {
+    const index = array.indexOf(book)
+    array.splice(index, 1)
+    if (openedBook === book) {
+        bookReader.innerHTML = ''
+    }
+    saveBooks()
+}
+
+function initDragAndDrop() {
+    booksFavoriteBlock.ondragenter = (event) => {
+        event.preventDefault()
+    }
+
+    booksFavoriteBlock.ondragover = (event) => {
+        event.preventDefault()
+    }
+
+    booksFavoriteBlock.ondrop = (event) => {
+        let bookFavorite = event.dataTransfer.getData('book')
+        if (!bookFavorite) {
+            return
+        }
+        bookFavorite = JSON.parse(bookFavorite)
+        booksFavorite.push(bookFavorite)
+        sortBookList(booksFavorite)
+        saveBooks()
+        createListBooksFavorite()
+    }
+}
+
+function addBookElementListeners(book, div, removeFromAll) {
+    const openBookEl = div.querySelector('.fa-book-open')
+    const deleteBookEl = div.querySelector('.fa-trash-alt')
+    const editBookEl = div.querySelector('.myBtn')
+    const checkBookEl = div.querySelector('.fa-check-square')
+    const closeModalEl = document.getElementsByClassName("close")[0];
+    const titleBookName = div.querySelector('.title-book')
+
+    editBookEl.onclick = () => editBookHandler(book)
+    closeModalEl.onclick = () => closeModal()
+    deleteBookEl.onclick = () => {
+        deleteBookHandler(book, booksFavorite)
+        createListBooksFavorite()
+        if (removeFromAll) {
+            deleteBookHandler(book, books)
+            createListBooks()
+        }
+    }
+    openBookEl.onclick = () => openBook(book)
+    titleBookName.onclick = () => openBook(book)
+    checkBookEl.onclick = () => checkBook(book)
 }
 
 function createListBooks() {
     listBooks.innerHTML = ''
     books.forEach(book => {
-        const div = document.createElement('div')
-        div.className = 'book'
-        if (book.finished) {
-            div.classList.add('finished-book')
-        }
-        div.innerHTML = `
-        <span class="title-book">${book.title}</span>
-        <div class="icons">
-            <i class="fas fa-book-open"></i>
-            <i class="fas fa-trash-alt"></i>
-            <i class="fas fa-edit myBtn"></i>
-            <i class="fas fa-check-square"></i>
-        </div>
-        `
+        
+        const div = craeteBookElement(book, true)
         listBooks.appendChild(div)
+        addBookElementListeners(book, div, true)
 
-        const openBookEl = div.querySelector('.fa-book-open')
-        const deleteBookEl = div.querySelector('.fa-trash-alt')
-        const editBookEl = div.querySelector('.myBtn')
-        const checkBookEl = div.querySelector('.fa-check-square')
-        const modalWindow = document.getElementById('myModal')
-        const closeModal = document.getElementsByClassName("close")[0];
-        const titleBookName = div.querySelector('.title-book')
-
-
-        editBookEl.addEventListener('click', () => {
-            modalWindow.style.display = "block";
-
-            const editTitleInput = document.querySelector('.edit-title-input')
-            const editTextInput = document.querySelector('.edit-text-input')
-            const editBtnUpload = document.getElementById('edit-btn-upload')
-
-
-            editTitleInput.value = book.title
-            editTextInput.value = book.text
-
-            editBtnUpload.onclick = () => {
-                const editTitleInputValue = editTitleInput.value
-                const editTextInputValue = editTextInput.value
-        
-                if (!editTitleInputValue  || !editTextInputValue) {
-                    alert('Поля не должны быть пустыми!')
-                    return
-                }
-    
-                book.title = editTitleInputValue
-                book.text = editTextInputValue
-                book.date = new Date()
-                saveBooks()
-                modalWindow.style.display = "none";
-                alert('Книга изменена')
-                createListBooks()
+        div.ondragstart = (event) => {
+            if (booksFavorite.some(b => b.title === book.title && b.text == book.text)) {
+                event.preventDefault()
+                return
             }
-        })
-        
-
-        closeModal.onclick = function() {
-            modalWindow.style.display = "none";
+            booksFavoriteBlock.style.border = '2px dashed black'
+            event.dataTransfer.setData('book', JSON.stringify(book))
         }
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modalWindow.style.display = "none";
-            }
-        }
+        div.ondragend = () => booksFavoriteBlock.removeAttribute('style')
+    })
+}
 
-        deleteBookEl.addEventListener('click', ()=> {
-            const index = books.indexOf(book)
-            books.splice(index, 1)
-            listBooks.removeChild(div)
-            if (openedBook === book) {
-                bookReader.innerHTML = ''
-            }
-            saveBooks()
-        })
-
-        openBookEl.addEventListener('click', () => openBook(book))
-        titleBookName.addEventListener('click', () => openBook(book))
-        checkBookEl.addEventListener('click', ()=> checkBook(div, book))
-
+function createListBooksFavorite() {
+    booksFavoriteBlock.innerHTML = ''
+    booksFavorite.forEach(book => {
+        
+        const div = craeteBookElement(book, false)
+        booksFavoriteBlock.appendChild(div)
+        addBookElementListeners(book, div, false)
     })
 }
 
@@ -207,23 +288,33 @@ function openBook(book) {
     `
 }
 
-function checkBook(div, book) {
-    book.finished = !book.finished
-    div.classList.toggle('finished-book')
-    sortBookList()
+function checkBook(book) {
+    const bookAll = books.find(b => b.text === book.text && b.title === book.title) 
+    if (bookAll) {
+        bookAll.finished = !bookAll.finished
+    } 
+
+    const bookFav = booksFavorite.find(b => b.text === book.text && b.title === book.title) 
+    if (bookFav) {
+        bookFav.finished = !bookFav.finished
+        sortBookList(booksFavorite)
+        createListBooksFavorite()
+    }
+    sortBookList(books)
     createListBooks()
     saveBooks()
 }
 
-function sortBookList() {
-    books.sort((a,b) => new Date(b.date) - new Date(a.date)).sort((a, b) => b.finished - a.finished)
+function sortBookList(array) {
+    array.sort((a,b) => new Date(b.date) - new Date(a.date)).sort((a, b) => b.finished - a.finished)
 }
 
 writeYourselfBtn.addEventListener('click', writeYourselfType)
 loadFromFileBtn.addEventListener('click', loadFromFileType)
 getBooks()
 createListBooks()
-
+createListBooksFavorite()
+initDragAndDrop()
 
 
 
