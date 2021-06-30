@@ -49,6 +49,14 @@ function writeYourselfType() {
             return
         }
 
+        if ((books.find(b => b.text === textInput.value && b.title === titleInput.value)) ||
+            (booksFavorite.find(b => b.text === textInput.value && b.title === titleInput.value))) {
+                alert('Такая книга уже существует')
+                return
+        }
+
+
+
         let file = new File([textInputValue], titleInputValue, { type: 'text/plain' })
         uploadFile(file, titleInputValue)
         titleInput.value = ''
@@ -73,6 +81,11 @@ function loadFromFileType() {
             alert('Поле не должны быть пустыми!')
             return
         }
+        if ((books.find(b => b.title === titleInput.value)) ||
+        (booksFavorite.find(b => b.title === titleInput.value))) {
+            alert('Такая книга уже существует')
+            return
+    }
         uploadFile(input.files.item(0), titleInputValue)
         titleInput.value = ''
     }
@@ -204,29 +217,19 @@ function deleteBookHandler(book, array) {
     saveBooks()
 }
 
-function initDragAndDrop() {
-    booksFavoriteBlock.ondragenter = (event) => {
+function initDragAndDrop(elem, ondrop) {
+    elem.ondragenter = (event) => {
         event.preventDefault()
     }
 
-    booksFavoriteBlock.ondragover = (event) => {
+    elem.ondragover = (event) => {
         event.preventDefault()
     }
 
-    booksFavoriteBlock.ondrop = (event) => {
-        let bookFavorite = event.dataTransfer.getData('book')
-        if (!bookFavorite) {
-            return
-        }
-        bookFavorite = JSON.parse(bookFavorite)
-        booksFavorite.push(bookFavorite)
-        sortBookList(booksFavorite)
-        saveBooks()
-        createListBooksFavorite()
-    }
+    elem.ondrop = ondrop
 }
 
-function addBookElementListeners(book, div, removeFromAll) {
+function addBookElementListeners(book, booksArray, div) {
     const openBookEl = div.querySelector('.fa-book-open')
     const deleteBookEl = div.querySelector('.fa-trash-alt')
     const editBookEl = div.querySelector('.myBtn')
@@ -237,12 +240,9 @@ function addBookElementListeners(book, div, removeFromAll) {
     editBookEl.onclick = () => editBookHandler(book)
     closeModalEl.onclick = () => closeModal()
     deleteBookEl.onclick = () => {
-        deleteBookHandler(book, booksFavorite)
+        deleteBookHandler(book, booksArray)
+        createListBooks()
         createListBooksFavorite()
-        if (removeFromAll) {
-            deleteBookHandler(book, books)
-            createListBooks()
-        }
     }
     openBookEl.onclick = () => openBook(book)
     titleBookName.onclick = () => openBook(book)
@@ -255,17 +255,12 @@ function createListBooks() {
         
         const div = craeteBookElement(book, true)
         listBooks.appendChild(div)
-        addBookElementListeners(book, div, true)
+        addBookElementListeners(book, books, div)
 
         div.ondragstart = (event) => {
-            if (booksFavorite.some(b => b.title === book.title && b.text == book.text)) {
-                event.preventDefault()
-                return
-            }
             booksFavoriteBlock.style.border = '2px dashed black'
             event.dataTransfer.setData('book', JSON.stringify(book))
         }
-
         div.ondragend = () => booksFavoriteBlock.removeAttribute('style')
     })
 }
@@ -274,9 +269,15 @@ function createListBooksFavorite() {
     booksFavoriteBlock.innerHTML = ''
     booksFavorite.forEach(book => {
         
-        const div = craeteBookElement(book, false)
+        const div = craeteBookElement(book, true)
         booksFavoriteBlock.appendChild(div)
-        addBookElementListeners(book, div, false)
+        addBookElementListeners(book, booksFavorite, div)
+
+        div.ondragstart = (event) => {
+            listBooks.style.border = '2px dashed black'
+            event.dataTransfer.setData('bookFavorite', JSON.stringify(book))
+        }
+        div.ondragend = () => listBooks.removeAttribute('style')
     })
 }
 
@@ -314,7 +315,39 @@ loadFromFileBtn.addEventListener('click', loadFromFileType)
 getBooks()
 createListBooks()
 createListBooksFavorite()
-initDragAndDrop()
+initDragAndDrop(booksFavoriteBlock, (event) => {
+    let bookFavorite = event.dataTransfer.getData('book')
+    if (!bookFavorite) {
+        return
+    }
+    bookFavorite = JSON.parse(bookFavorite)
+    booksFavorite.push(bookFavorite)
+    sortBookList(booksFavorite)
+    const book = books.find(b => b.title === bookFavorite.title && b.text === bookFavorite.text)
+    if (book) {
+        books.splice(books.indexOf(book), 1)
+    }
+    saveBooks()
+    createListBooksFavorite()
+    createListBooks()
+})
+
+initDragAndDrop(listBooks, (event) => {
+    let book = event.dataTransfer.getData('bookFavorite')
+    if (!book) {
+        return
+    }
+    book = JSON.parse(book)
+    books.push(book)
+    sortBookList(books)
+    const bookFavorite = booksFavorite.find(b => b.title === book.title && b.text === book.text)
+    if (bookFavorite) {
+        booksFavorite.splice(booksFavorite.indexOf(bookFavorite), 1)
+    }
+    saveBooks()
+    createListBooksFavorite()
+    createListBooks()
+})
 
 
 
